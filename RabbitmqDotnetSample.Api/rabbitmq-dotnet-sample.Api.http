@@ -1,0 +1,6 @@
+@rabbitmq_dotnet_sample.Api_HostAddress = http://localhost:5040
+
+GET {{rabbitmq_dotnet_sample.Api_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
