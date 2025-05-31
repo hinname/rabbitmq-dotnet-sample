@@ -1,0 +1,11 @@
+services:
+  webapi:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: rabbitmq-sample-webapi
+    restart: always
+    ports:
+      - "8080:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
