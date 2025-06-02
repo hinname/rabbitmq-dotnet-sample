@@ -1,4 +1,5 @@
-using Microsoft.AspNetCore.Http.HttpResults;
+using Microsoft.AspNetCore.Mvc;
+using rabbitmq_dotnet_sample.Api.Bus;
 using rabbitmq_dotnet_sample.Api.Extensions;
 using rabbitmq_dotnet_sample.Api.Reports;
 using rabbitmq_dotnet_sample.Api.Reports.Response;
@@ -9,7 +10,9 @@ public static class ApiEndpoints
 {
     public static void AddApiEndpoints(this WebApplication app)
     {
-        app.MapPost("/api/report", (string name, string description) =>
+        app.MapPost("/api/report", async (string name, string description, 
+            [FromServices] IProjectPublishBus bus,
+            CancellationToken ct = default) =>
         {
 
             var report = new RequestedReport
@@ -20,11 +23,11 @@ public static class ApiEndpoints
                 Status = Status.Pending
             };
             
-            
-
-            // Here you would typically send the report to a message queue for processing
             ReportsList.Reports.Add(report);
             
+            // Publish the report to the bus
+            var eventRequest = new RequestedReportEvent(report.Id, report.Name, report.Description);
+            await bus.PublishAsync(eventRequest, ct);
             
             // Convert to ResponseRequestedReport
             var responseReport = new ResponseRequestedReport

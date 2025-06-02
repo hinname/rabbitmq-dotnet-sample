@@ -1,4 +1,6 @@
 using MassTransit;
+using rabbitmq_dotnet_sample.Api.Bus;
+using rabbitmq_dotnet_sample.Api.Bus.Consumers;
 
 namespace rabbitmq_dotnet_sample.Api.Extensions;
 
@@ -6,6 +8,10 @@ public static class AppExtensions
 {
     public static void AddRabbitMqService(this IServiceCollection services, IConfiguration configuration)
     {
+
+        // Register the bus publish service
+        services.AddTransient<IProjectPublishBus, ProjectPublishBus>();
+        
         services.AddMassTransit(busConfigurator =>
         {
             busConfigurator.UsingRabbitMq((context, cfg) =>
@@ -18,6 +24,8 @@ public static class AppExtensions
                 
                 cfg.ConfigureEndpoints(context);
             });
+            
+            busConfigurator.AddConsumer<RequestedReportEventConsumer>();
         });
     }
 }
